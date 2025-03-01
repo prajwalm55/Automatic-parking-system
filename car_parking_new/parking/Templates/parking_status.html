@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Lot Availability</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .spot {
+            font-size: 24px;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .available {
+            background-color: green;
+            color: white;
+        }
+        .booked {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Parking Lot Availability</h1>
+    <div id="parkingSpots">
+        <!-- Parking spot statuses will be dynamically updated here -->
+    </div>
+
+    <script>
+        // Function to fetch the parking spot status from the Flask back-end API
+        function fetchParkingStatus() {
+            fetch('http://localhost:5000/parking_status')
+                .then(response => response.json())
+                .then(data => {
+                    const parkingSpots = data.parking_spots;
+                    const parkingContainer = document.getElementById('parkingSpots');
+                    parkingContainer.innerHTML = '';  // Clear previous status
+
+                    // Create a div for each parking spot
+                    parkingSpots.forEach((status, index) => {
+                        const spotDiv = document.createElement('div');
+                        spotDiv.classList.add('spot');
+                        if (status === 1) {
+                            spotDiv.classList.add('available');
+                            spotDiv.innerText = `Spot ${index + 1}: Available`;
+                        } else {
+                            spotDiv.classList.add('booked');
+                            spotDiv.innerText = `Spot ${index + 1}: Booked`;
+                        }
+                        parkingContainer.appendChild(spotDiv);
+                    });
+                })
+                .catch(error => console.error('Error fetching parking status:', error));
+        }
+
+        // Refresh the parking status every second
+        setInterval(fetchParkingStatus, 1000);
+
+        // Initial fetch when the page loads
+        fetchParkingStatus();
+    </script>
+</body>
+</html>

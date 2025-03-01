@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Check Parking Status</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+    /* General Body Styling */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #2c571a;
+      color: #333;
+      margin-top: 80px;
+    }
+
+    /* Navbar Styling */
+    .navbar {
+      border-bottom: 2px solid #ddd;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.8rem;
+      color: #fff !important;
+    }
+    .navbar-nav .nav-link {
+      color: #fff;
+      font-size: 1.1rem;
+      padding: 10px 15px;
+    }
+    .navbar-nav .nav-link:hover {
+      background-color: #32886b;
+      border-radius: 5px;
+    }
+
+    /* Slot Cards Styling */
+    .slot-card {
+      margin-bottom: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .slot-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Slot Card Inner Styling */
+    .card-body {
+      text-align: center;
+      padding: 30px;
+      background-color: #e1e9e5;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Slot Button Styling */
+    .car-button {
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 10px;
+      width: 100%;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+
+    .booked {
+      background-color: #e44f5e;
+      color: white;
+      cursor: not-allowed;
+    }
+    .available {
+      background-color: #28a745;
+      color: white;
+    }
+    .available:hover {
+      background-color: #218838;
+    }
+
+    /* Input Fields Styling */
+    input[type="text"],
+    input[type="date"],
+    input[type="time"] {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+    }
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    input[type="time"]:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .card-body img {
+        width: 80px;
+        height: 55px;
+      }
+      .slot-card {
+        margin-bottom: 15px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .section-title {
+        font-size: 1.6rem;
+      }
+      .navbar-brand {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+<script>
+  // Function to compare system time with user-entered "From Time" and "From Date"
+  function validateBookingTime() {
+    const fromTime = document.getElementById('from-time-input').value;
+    const fromDate = document.getElementById('selected-date').value; // User-selected date
+    const endTime = document.getElementById('end-time-input').value;
+    const systemTime = new Date(); // Get current system time
+    const systemDate = systemTime.toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+    const systemHour = systemTime.getHours();
+    const systemMinute = systemTime.getMinutes();
+
+    // Combine system date and time for comparison
+    const systemDateTime = new Date(`${systemDate}T${systemHour}:${systemMinute}:00`);
+
+    // Parse the user-selected "From Time" and "From Date"
+    const userDateTime = new Date(`${fromDate}T${fromTime}:00`);
+
+    // If user-selected "From Time" matches the system time
+    if (userDateTime <= systemDateTime) {
+      alert("Your slot time is starting for parking.");
+    } else {
+      alert("Booked successfully, waiting for your time to park the vehicle.");
+    }
+
+     // If the "End Time" matches the system time
+    if (userEndTime <= systemTime) {
+      alert("Your slot time ends. Please take your vehicle.");
+    }
+
+    // Check if "From Time" and "End Time" are valid (End Time must be later than From Time)
+    if (fromTime && endTime) {
+      const from = new Date(`1970-01-01T${fromTime}:00`);
+      const to = new Date(`1970-01-01T${endTime}:00`);
+
+      if (from >= to) {
+        alert("End time must be later than the start time.");
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Function to check if the "End Time" matches system time
+  function checkEndTime() {
+    const endTime = document.getElementById('end-time-input').value;
+    const endDate = document.getElementById('selected-date').value; // User-selected date
+    const systemTime = new Date(); // Get current system time
+    const systemDate = systemTime.toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+
+    // Parse the user-selected "End Time"
+    const userEndTime = new Date(`${endDate}T${endTime}:00`);
+    
+    // If the "End Time" matches the system time
+    if (userEndTime <= systemTime) {
+      alert("Your slot time ends. Please take your vehicle.");
+    }
+  }
+
+  // Function to dynamically update the "End Time" field
+  function setEndTime() {
+    const endTimeInput = document.getElementById('end-time-input').value;
+    document.getElementById('end-time').innerText = endTimeInput;
+    // Set hidden input for "End Time" so it can be submitted with the form
+    document.getElementById('end-time-input-hidden').value = endTimeInput;
+  }
+
+  // Initialize the page and reset the "End Time" display
+  window.onload = function () {
+    document.getElementById('end-time').innerText = '';
+  };
+</script>
+
+
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <h2 class="navbar-brand">CAR PARKING MANAGEMENT</h2>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('check') }}">Check Parking Status</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Parking Status Section -->
+  <div class="container mt-5">
+    <h3 class="section-title">Available Parking Slots</h3>
+    <div class="row">
+      {% for slot, data in parking_status.items() %}
+        <div class="col-md-3 col-sm-6">
+          <div class="card slot-card">
+            <div class="card-body">
+              <!-- Slot status check -->
+              {% if data['booked'] %}
+                <img src="static/source/image/car_red.jpg" alt="Car" class="img-fluid mb-3" style="width: 100px; height: 70px;">
+              {% else %}
+                <img src="static/source/image/car1.png" alt="Car" class="img-fluid mb-3" style="width: 100px; height: 70px;">
+              {% endif %}
+
+              {% if data['booked'] %}
+                <button class="btn car-button booked" disabled>Slot {{ loop.index }} (Booked)</button>
+              {% else %}
+              <form method="POST" onsubmit="return validateBookingTime()">
+                <input type="hidden" name="selected_slot" value="{{ loop.index }}">
+                  <input type="text" name="registration_number" placeholder="Enter Reg No" class="form-control mb-2" required>
+                <label for="selected-date">Select Date:</label>
+                <input type="date" id="selected-date" name="selected_date" required>
+              
+                <label for="from-time-input">From Time:</label>
+                <input type="time" id="from-time-input" name="from_time" required>
+              
+                <label for="end-time-input">End Time:</label>
+                <input type="time" id="end-time-input" name="end_time" required>
+              
+                <button type="submit" class="btn btn-primary">Book Slot</button>
+              </form>
+              
+              <p id="end-time"></p> <!-- Dynamic End Time Display -->
+              
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+`
+ 
